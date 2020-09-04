@@ -525,8 +525,9 @@ namespace FRFuel
             {
                 Game.DisableControlThisFrame(0, Control.VehicleHorn);
 
-                // Also disable the rocket boost control for DLC cars.
+                // Also disable the jump/rocket boost control for DLC cars.
                 Game.DisableControlThisFrame(0, (Control)351); // INPUT_VEH_ROCKET_BOOST (E on keyboard, L3 on controller)
+                Game.DisableControlThisFrame(0, (Control)350); // INPUT_VEH_CAR_JUMP (E on keyboard, L3 on controller)
             }
 
             if (Game.IsControlJustReleased(0, engineToggleControl) && !Game.IsControlPressed(0, Control.Jump))
