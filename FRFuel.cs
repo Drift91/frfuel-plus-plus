@@ -572,7 +572,7 @@ namespace FRFuel
                 }
             }
 
-            if (showHud && IsHudPreferenceSwitchedOn())
+            if (showHud && IsHudPreferenceSwitchedOn() && !IsHudHidden())
             {
                 // If not near any pump.
                 if (currentGasStationIndex == -1)
