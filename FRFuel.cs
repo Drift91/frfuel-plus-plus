@@ -720,7 +720,7 @@ namespace FRFuel
                                 }
                                 else
                                 {
-                                    VehicleSetFuelLevel(vehicle, current + 0.2f);
+                                    VehicleSetFuelLevel(vehicle, current + (0.1f * refuelRate));
                                 }
                             }
                         }
