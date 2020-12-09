@@ -554,6 +554,8 @@ namespace FRFuel
         /// <param name="playerPed"></param>
         public void RenderUI(Ped playerPed)
         {
+            var vehicle = Game.PlayerPed.CurrentVehicle;
+
             var gasStationIndex = GetGasStationIndexInRange(playerPed.Position, showMarkerInRangeSquared);
 
             if (gasStationIndex != -1)
@@ -575,8 +577,8 @@ namespace FRFuel
 
             if (showHud && IsHudPreferenceSwitchedOn() && !IsHudHidden())
             {
-                // If not near any pump.
-                if (currentGasStationIndex == -1)
+                // If not near any pump or fuel truck.
+                if (currentGasStationIndex == -1 && !IsVehicleNearAnyFuelTruck(vehicle))
                 {
                     // If the engine is on, then display it no matter the config option.
                     if (playerPed.CurrentVehicle.IsEngineRunning)
