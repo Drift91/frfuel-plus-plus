@@ -536,13 +536,13 @@ namespace FRFuel
                 {
                     vehicle.IsDriveable = false;
                     //vehicle.IsEngineRunning = false;
-                    API.SetVehicleEngineOn(vehicle.Handle, false, true, true); // temporary fix for when the engine keeps turning back on.
+                    API.SetVehicleEngineOn(vehicle.Handle, false, false, true); // temporary fix for when the engine keeps turning back on.
                 }
                 else
                 {
                     vehicle.IsDriveable = true;
                     // FIXME: No neat default behaviour in 1103 :c
-                    vehicle.IsEngineRunning = true;
+                    API.SetVehicleEngineOn(vehicle.Handle, true, false, true);
                 }
             }
         }
