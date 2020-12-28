@@ -293,7 +293,7 @@ namespace FRFuel
             {
                 var vehicle = Game.PlayerPed.CurrentVehicle;
 
-                vehicle.SetDecor(fuelLevelPropertyName, vehicle.GetDecor<float>(fuelLevelPropertyName) + amount);
+                VehicleSetFuelLevel(vehicle, vehicle.GetDecor<float>(fuelLevelPropertyName) + amount);
             }
         }
 
@@ -307,8 +307,7 @@ namespace FRFuel
             {
                 var vehicle = Game.PlayerPed.CurrentVehicle;
 
-                //VehicleSetFuelLevel(vehicle, amount);
-                vehicle.SetDecor(fuelLevelPropertyName, amount);
+                VehicleSetFuelLevel(vehicle, amount);
             }
         }
 
@@ -442,8 +441,6 @@ namespace FRFuel
                     fuel -= consumedFuel * fuelConsumptionRate;
                     fuel = fuel < 0f ? 0f : fuel;
                 }
-
-                vehicle.SetDecor(fuelLevelPropertyName, fuel);
             }
 
             if (fuel == 0f && vehicle.IsEngineRunning)
@@ -491,8 +488,6 @@ namespace FRFuel
 
                                 fuel += fuelPortion;
                                 addedFuelCapacitor += fuelPortion;
-
-                                vehicle.SetDecor(fuelLevelPropertyName, fuel);
                             }
                         }
 
@@ -520,6 +515,8 @@ namespace FRFuel
 
                 hudActive = false;
             }
+
+            VehicleSetFuelLevel(vehicle, fuel);
         }
 
         /// <summary>
