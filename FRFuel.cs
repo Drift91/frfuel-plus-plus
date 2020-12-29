@@ -443,7 +443,7 @@ namespace FRFuel
                 }
             }
 
-            if (fuel == 0f && vehicle.IsEngineRunning)
+            if (PlayerVehicleViableForFuel() && fuel == 0f && vehicle.IsEngineRunning)
             {
                 vehicle.IsEngineRunning = false;
             }
@@ -765,6 +765,7 @@ namespace FRFuel
                 vehicle.Model.IsQuadbike
               ) &&
               vehicle.GetPedOnSeat(VehicleSeat.Driver) == playerPed &&
+              VehicleMaxFuelLevel(vehicle) > 0 &&
               vehicle.IsAlive;
         }
 
