@@ -429,11 +429,12 @@ namespace FRFuel
 
                 if (vehicle.Model.IsHelicopter)
                 {
-                    fuel -= consumedFuel * 3.4f;
+                    fuel -= consumedFuel * fuelConsumptionRate * 3.4f;
                     fuel = fuel < 0f ? 0f : fuel;
-                } else if (vehicle.Model.IsQuadbike)
+                }
+                else if (vehicle.Model.IsQuadbike)
                 {
-                    fuel -= consumedFuel * 0.25f;
+                    fuel -= consumedFuel * fuelConsumptionRate * 0.25f;
                     fuel = fuel < 0f ? 0f : fuel;
                 }
                 else
