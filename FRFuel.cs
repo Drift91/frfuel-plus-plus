@@ -38,6 +38,7 @@ namespace FRFuel
         protected float fuelAccelerationImpact = 0.0002f;
         protected float fuelTractionImpact = 0.0001f;
         protected float fuelRPMImpact = 0.0005f;
+        protected float fuelWeightImpact = 0.0005f;
 
         public float showMarkerInRangeSquared = 250f;
 
@@ -426,6 +427,7 @@ namespace FRFuel
                 consumedFuel += normalizedRPMValue * fuelRPMImpact;
                 consumedFuel += vehicle.Acceleration * fuelAccelerationImpact;
                 consumedFuel += vehicle.MaxTraction * fuelTractionImpact;
+                consumedFuel *= GetVehicleHandlingFloat(vehicle.Handle, "CHandlingData_", "fMass") * fuelWeightImpact;
 
                 if (vehicle.Model.IsHelicopter)
                 {
