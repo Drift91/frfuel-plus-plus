@@ -280,7 +280,7 @@ namespace FRFuel
                 return -1f;
             }
 
-            return Game.PlayerPed.CurrentVehicle.FuelLevel;
+            return Game.PlayerPed.CurrentVehicle.GetDecor<float>(fuelLevelPropertyName);
         }
 
         /// <summary>
@@ -293,7 +293,7 @@ namespace FRFuel
             {
                 var vehicle = Game.PlayerPed.CurrentVehicle;
 
-                VehicleSetFuelLevel(vehicle, vehicle.FuelLevel + amount);
+                VehicleSetFuelLevel(vehicle, vehicle.GetDecor<float>(fuelLevelPropertyName) + amount);
             }
         }
 
@@ -429,11 +429,12 @@ namespace FRFuel
 
                 if (vehicle.Model.IsHelicopter)
                 {
-                    fuel -= consumedFuel * 3.4f;
+                    fuel -= consumedFuel * fuelConsumptionRate * 3.4f;
                     fuel = fuel < 0f ? 0f : fuel;
-                } else if (vehicle.Model.IsQuadbike)
+                }
+                else if (vehicle.Model.IsQuadbike)
                 {
-                    fuel -= consumedFuel * 0.25f;
+                    fuel -= consumedFuel * fuelConsumptionRate * 0.25f;
                     fuel = fuel < 0f ? 0f : fuel;
                 }
                 else
@@ -443,6 +444,11 @@ namespace FRFuel
                 }
             }
 
+            if (PlayerVehicleViableForFuel() && fuel == 0f && vehicle.IsEngineRunning)
+            {
+                vehicle.IsEngineRunning = false;
+            }
+            
 #if MANUAL_ENGINE_CUTOFF
             if (fuel == 0f && vehicle.IsEngineRunning)
             {
@@ -536,13 +542,13 @@ namespace FRFuel
                 {
                     vehicle.IsDriveable = false;
                     //vehicle.IsEngineRunning = false;
-                    API.SetVehicleEngineOn(vehicle.Handle, false, true, true); // temporary fix for when the engine keeps turning back on.
+                    API.SetVehicleEngineOn(vehicle.Handle, false, false, true); // temporary fix for when the engine keeps turning back on.
                 }
                 else
                 {
                     vehicle.IsDriveable = true;
                     // FIXME: No neat default behaviour in 1103 :c
-                    vehicle.IsEngineRunning = true;
+                    API.SetVehicleEngineOn(vehicle.Handle, true, false, true);
                 }
             }
         }
@@ -554,6 +560,8 @@ namespace FRFuel
         /// <param name="playerPed"></param>
         public void RenderUI(Ped playerPed)
         {
+            var vehicle = Game.PlayerPed.CurrentVehicle;
+
             var gasStationIndex = GetGasStationIndexInRange(playerPed.Position, showMarkerInRangeSquared);
 
             if (gasStationIndex != -1)
@@ -575,24 +583,24 @@ namespace FRFuel
 
             if (showHud && IsHudPreferenceSwitchedOn() && !IsHudHidden())
             {
-                // If not near any pump.
-                if (currentGasStationIndex == -1)
+                // If not near any pump or fuel truck.
+                if (currentGasStationIndex == -1 && !IsVehicleNearAnyFuelTruck(vehicle))
                 {
                     // If the engine is on, then display it no matter the config option.
                     if (playerPed.CurrentVehicle.IsEngineRunning)
                     {
-                        hud.RenderBar(playerPed.CurrentVehicle.FuelLevel, fuelTankCapacity);
+                        hud.RenderBar(playerPed.CurrentVehicle.GetDecor<float>(fuelLevelPropertyName), fuelTankCapacity);
                     }
                     // If the engine is not running, then only display it if ShowHudWhenEngineOff is true.
                     else if (showHudWhenEngineOff)
                     {
-                        hud.RenderBar(playerPed.CurrentVehicle.FuelLevel, fuelTankCapacity);
+                        hud.RenderBar(playerPed.CurrentVehicle.GetDecor<float>(fuelLevelPropertyName), fuelTankCapacity);
                     }
                 }
                 // If near a pump, always display the hud bar.
                 else
                 {
-                    hud.RenderBar(playerPed.CurrentVehicle.FuelLevel, fuelTankCapacity);
+                    hud.RenderBar(playerPed.CurrentVehicle.GetDecor<float>(fuelLevelPropertyName), fuelTankCapacity);
                 }
             }
         }
@@ -614,8 +622,6 @@ namespace FRFuel
                     RandomizeFuelLevel(fuelTankCapacity)
                 );
             }
-
-            vehicle.FuelLevel = vehicle.GetDecor<float>(fuelLevelPropertyName);
         }
 
         /// <summary>
@@ -645,7 +651,6 @@ namespace FRFuel
                 fuelLevel = max;
             }
 
-            vehicle.FuelLevel = fuelLevel;
             vehicle.SetDecor(fuelLevelPropertyName, fuelLevel);
         }
 
@@ -761,6 +766,7 @@ namespace FRFuel
                 vehicle.Model.IsQuadbike
               ) &&
               vehicle.GetPedOnSeat(VehicleSeat.Driver) == playerPed &&
+              VehicleMaxFuelLevel(vehicle) > 0 &&
               vehicle.IsAlive;
         }
 
